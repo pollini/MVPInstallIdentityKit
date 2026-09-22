@@ -30,6 +30,19 @@ public enum KeychainAccessibility {
     /// Accessible whenever the device is unlocked; also device-local only.
     case whenUnlockedThisDeviceOnly
 
+    /// Accessible once the device has been unlocked after a reboot. Unlike
+    /// the `ThisDeviceOnly` variants, this item is included when the user
+    /// restores an encrypted backup (iCloud or Finder/local) onto a
+    /// **replacement** device — e.g. "old iPhone → new iPhone" via Quick
+    /// Start / backup restore — so the identity carries over from that one
+    /// migration, without opting into ongoing iCloud Keychain sync between
+    /// devices used side by side. This is the narrower, more conservative
+    /// fallback compared to `afterFirstUnlockSynchronizable`: no dependency
+    /// on the iCloud Keychain toggle, no live cross-device merging — just
+    /// "survives being restored onto my next device". See the README
+    /// section on cross-device identity.
+    case afterFirstUnlockMigratable
+
     /// Accessible once the device has been unlocked after a reboot, and
     /// **synced via iCloud Keychain** to the user's other devices signed
     /// into the same iCloud account (e.g. their next phone after an

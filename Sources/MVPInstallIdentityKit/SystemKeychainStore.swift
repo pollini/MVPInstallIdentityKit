@@ -88,18 +88,18 @@ private extension KeychainAccessibility {
             return kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         case .whenUnlockedThisDeviceOnly:
             return kSecAttrAccessibleWhenUnlockedThisDeviceOnly
-        case .afterFirstUnlockSynchronizable:
-            // "ThisDeviceOnly" accessibility values are never eligible for
-            // iCloud Keychain sync, so the synchronizable case must use the
-            // plain (non-"ThisDeviceOnly") accessible-after-first-unlock
-            // constant.
+        case .afterFirstUnlockMigratable, .afterFirstUnlockSynchronizable:
+            // "ThisDeviceOnly" accessibility values are never included in
+            // backup restores or eligible for iCloud Keychain sync, so both
+            // cross-device cases must use the plain (non-"ThisDeviceOnly")
+            // accessible-after-first-unlock constant.
             return kSecAttrAccessibleAfterFirstUnlock
         }
     }
 
     var isSynchronizable: Bool {
         switch self {
-        case .afterFirstUnlockThisDeviceOnly, .whenUnlockedThisDeviceOnly:
+        case .afterFirstUnlockThisDeviceOnly, .whenUnlockedThisDeviceOnly, .afterFirstUnlockMigratable:
             return false
         case .afterFirstUnlockSynchronizable:
             return true

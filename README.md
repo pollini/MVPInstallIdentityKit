@@ -69,30 +69,53 @@ first-access thread-safety.
 By default the identity is strictly per-device: reinstalling the app on the
 *same* device finds it, but a fresh install on a *different* device (e.g. the
 user's new phone after an upgrade) looks like a genuinely first-ever launch.
+There are two opt-in ways to change that, depending on which scenario you
+actually care about:
 
-If you want the identity to follow the user to their next device instead,
-opt into iCloud Keychain sync by passing `.afterFirstUnlockSynchronizable`:
+|  | `afterFirstUnlockThisDeviceOnly` (default) | `afterFirstUnlockMigratable` | `afterFirstUnlockSynchronizable` |
+|---|---|---|---|
+| Survives app delete + reinstall (same device) | ✅ | ✅ | ✅ |
+| Survives restoring a backup onto a **replacement** device (e.g. "old iPhone → new iPhone" via Quick Start) | ❌ | ✅ | ✅ |
+| Live-syncs between two devices used **side by side** via iCloud Keychain | ❌ | ❌ | ✅ |
+| Requires iCloud Keychain enabled | no | no | yes |
+
+**`.afterFirstUnlockMigratable`** — the narrower, conservative option — covers
+"the app was never uninstalled, but the user moved to new hardware" (new
+iPhone, or in principle a new Mac, though macOS's Migration Assistant has its
+own, less predictable keychain-transfer behavior — see
+[Known limitations](#known-limitations)). It rides along automatically the
+next time the user sets up a new device *from a backup* of this one; it does
+not require the iCloud Keychain toggle at all, and it never merges state
+between two devices the user happens to use at the same time.
+
+```swift
+let identifier = InstallIdentifier(accessibility: .afterFirstUnlockMigratable)
+let info = try identifier.resolve()
+```
+
+**`.afterFirstUnlockSynchronizable`** — the broader option — additionally
+turns on continuous iCloud Keychain sync, so the identity also appears on a
+second device the user is using in parallel (not just after a migration).
 
 ```swift
 let identifier = InstallIdentifier(accessibility: .afterFirstUnlockSynchronizable)
 let info = try identifier.resolve()
 ```
 
-This stores the item as syncable, so once it has synced, `resolve()` on the
-user's other devices signed into the same iCloud account will read back the
-same `id` and `firstSeenDate` instead of creating a new record. Tradeoffs to
-be aware of before enabling this:
+Tradeoffs to be aware of before choosing either non-default option:
 
-- Requires the user to have **iCloud Keychain** enabled; if it's off (or
-  they're not signed in), behavior silently falls back to being device-local.
-- Sync is not instant — a new device may briefly report
-  `isFirstLaunchEver == true` before the existing item has propagated.
-- This is no longer a purely "one device" signal — factor that into how you
-  use `isFirstLaunchEver` (e.g. it's a better fit for "has this *user*
-  installed before" than for anything meant to be tied to one physical
-  device).
-- It syncs only within the user's own iCloud account/devices, never across
-  different users or Apple IDs — it does not turn this into a
+- `.afterFirstUnlockSynchronizable` requires the user to have **iCloud
+  Keychain** enabled; if it's off (or they're not signed in), it silently
+  behaves like `.afterFirstUnlockMigratable` instead.
+- Sync (for `.afterFirstUnlockSynchronizable`) is not instant — a new device
+  may briefly report `isFirstLaunchEver == true` before the existing item has
+  propagated.
+- Neither option is a purely "one device" signal anymore — factor that into
+  how you use `isFirstLaunchEver` (both are a better fit for "has this
+  *user* installed before" than for anything meant to be tied to one
+  physical device).
+- Both sync/migrate only within the user's own iCloud account/devices, never
+  across different users or Apple IDs — neither turns this into a
   cross-user tracking or fingerprinting mechanism.
 
 ## Installation
