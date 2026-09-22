@@ -1,0 +1,39 @@
+import Foundation
+
+/// Abstraction over a key/value secure store, scoped by `service` + `account`.
+///
+/// Modeled after the iOS/macOS Keychain, but kept as a protocol so the rest of
+/// the library never talks to `Security.framework` directly. This is what
+/// makes `InstallIdentifier` unit-testable without touching the real Keychain
+/// (which is unreliable / unavailable in plain `swift test` / CI environments).
+public protocol KeychainStoring {
+    /// Reads the raw bytes stored for `service` + `account`, or `nil` if nothing is stored.
+    func read(service: String, account: String) throws -> Data?
+
+    /// Writes `data` for `service` + `account`, overwriting any previous value.
+    func write(service: String, account: String, data: Data, accessibility: KeychainAccessibility) throws
+
+    /// Removes any value stored for `service` + `account`. No-op if nothing is stored.
+    func delete(service: String, account: String) throws
+}
+
+/// Mirrors the subset of `kSecAttrAccessible*` constants relevant to a
+/// device-local, non-iCloud-synced identifier. Kept as our own enum so
+/// `KeychainStoring` doesn't leak `Security.framework` types into call sites.
+public enum KeychainAccessibility {
+    /// Accessible once the device has been unlocked after a reboot, and never
+    /// migrates to other devices via iCloud Keychain. This is the right
+    /// default for a device-local install identifier.
+    case afterFirstUnlockThisDeviceOnly
+
+    /// Accessible whenever the device is unlocked; also device-local only.
+    case whenUnlockedThisDeviceOnly
+}
+
+/// Errors surfaced by `KeychainStoring` implementations.
+public enum KeychainError: Error, Equatable {
+    /// The underlying store rejected the write/read/delete with the given OSStatus.
+    case underlying(status: Int32)
+    /// The data read back from the store could not be decoded as an `InstallRecord`.
+    case corruptedRecord
+}
