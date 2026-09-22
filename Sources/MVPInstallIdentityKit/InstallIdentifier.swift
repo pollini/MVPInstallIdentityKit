@@ -44,7 +44,7 @@ public final class InstallIdentifier {
     ///   - store: Injectable for testing. Defaults to the real Keychain.
     public init(
         service: String = Bundle.main.bundleIdentifier ?? "MVPInstallIdentityKit",
-        account: String = "com.installidentitykit.identity",
+        account: String = "de.mvp-systems.mvpinstallidentitykit.identity",
         accessibility: KeychainAccessibility = .afterFirstUnlockThisDeviceOnly,
         store: KeychainStoring = SystemKeychainStore()
     ) {
