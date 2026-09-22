@@ -1,4 +1,4 @@
-# InstallIdentityKit
+# MVPInstallIdentityKit
 
 A tiny, dependency-free Swift package that answers one question reliably:
 
@@ -14,7 +14,7 @@ persists a small, fully anonymous record in the **Keychain** instead, which
 survives app deletion as long as the device itself isn't wiped.
 
 ```swift
-import InstallIdentityKit
+import MVPInstallIdentityKit
 
 let info = try InstallIdentifier.shared.resolve()
 
@@ -68,7 +68,7 @@ Swift Package Manager, via Xcode: **File → Add Package Dependencies…** and
 point it at this repository, or add it to `Package.swift`:
 
 ```swift
-.package(url: "https://github.com/pollini/InstallIdentityKit.git", from: "1.0.0")
+.package(url: "https://github.com/pollini/MVPInstallIdentityKit.git", from: "1.0.0")
 ```
 
 ## Privacy & App Store notes

@@ -1,5 +1,5 @@
 import XCTest
-@testable import InstallIdentityKit
+@testable import MVPInstallIdentityKit
 
 final class InstallIdentifierTests: XCTestCase {
 

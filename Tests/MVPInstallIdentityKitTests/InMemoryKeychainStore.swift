@@ -1,5 +1,5 @@
 import Foundation
-@testable import InstallIdentityKit
+@testable import MVPInstallIdentityKit
 
 /// In-memory stand-in for the real Keychain so tests are fast, deterministic,
 /// and don't depend on a Keychain being available (e.g. Linux CI runners

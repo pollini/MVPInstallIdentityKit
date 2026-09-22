@@ -2,25 +2,25 @@
 import PackageDescription
 
 let package = Package(
-    name: "InstallIdentityKit",
+    name: "MVPInstallIdentityKit",
     platforms: [
         .iOS(.v13),
         .macOS(.v11)
     ],
     products: [
         .library(
-            name: "InstallIdentityKit",
-            targets: ["InstallIdentityKit"]
+            name: "MVPInstallIdentityKit",
+            targets: ["MVPInstallIdentityKit"]
         )
     ],
     targets: [
         .target(
-            name: "InstallIdentityKit",
+            name: "MVPInstallIdentityKit",
             dependencies: []
         ),
         .testTarget(
-            name: "InstallIdentityKitTests",
-            dependencies: ["InstallIdentityKit"]
+            name: "MVPInstallIdentityKitTests",
+            dependencies: ["MVPInstallIdentityKit"]
         )
     ]
 )
