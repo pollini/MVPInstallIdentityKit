@@ -38,6 +38,7 @@ public final class SystemKeychainStore: KeychainStoring {
         var addQuery = baseQuery(service: service, account: account)
         addQuery[kSecValueData as String] = data
         addQuery[kSecAttrAccessible as String] = accessibility.secAttrValue
+        addQuery[kSecAttrSynchronizable as String] = accessibility.isSynchronizable
 
         let addStatus = SecItemAdd(addQuery as CFDictionary, nil)
         if addStatus == errSecSuccess {
@@ -70,7 +71,12 @@ public final class SystemKeychainStore: KeychainStoring {
         [
             kSecClass as String: kSecClassGenericPassword,
             kSecAttrService as String: service,
-            kSecAttrAccount as String: account
+            kSecAttrAccount as String: account,
+            // Without this, SecItemCopyMatching/SecItemDelete only match
+            // non-synchronizable items, so a record written with
+            // `.afterFirstUnlockSynchronizable` (or one synced down from
+            // another device) would silently look "not found" on read.
+            kSecAttrSynchronizable as String: kSecAttrSynchronizableAny
         ]
     }
 }
@@ -82,6 +88,21 @@ private extension KeychainAccessibility {
             return kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly
         case .whenUnlockedThisDeviceOnly:
             return kSecAttrAccessibleWhenUnlockedThisDeviceOnly
+        case .afterFirstUnlockSynchronizable:
+            // "ThisDeviceOnly" accessibility values are never eligible for
+            // iCloud Keychain sync, so the synchronizable case must use the
+            // plain (non-"ThisDeviceOnly") accessible-after-first-unlock
+            // constant.
+            return kSecAttrAccessibleAfterFirstUnlock
+        }
+    }
+
+    var isSynchronizable: Bool {
+        switch self {
+        case .afterFirstUnlockThisDeviceOnly, .whenUnlockedThisDeviceOnly:
+            return false
+        case .afterFirstUnlockSynchronizable:
+            return true
         }
     }
 }

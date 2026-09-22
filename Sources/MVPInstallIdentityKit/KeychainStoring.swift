@@ -17,9 +17,10 @@ public protocol KeychainStoring {
     func delete(service: String, account: String) throws
 }
 
-/// Mirrors the subset of `kSecAttrAccessible*` constants relevant to a
-/// device-local, non-iCloud-synced identifier. Kept as our own enum so
-/// `KeychainStoring` doesn't leak `Security.framework` types into call sites.
+/// Mirrors the subset of `kSecAttrAccessible*` constants relevant to an
+/// install identifier, plus whether the item should sync via iCloud
+/// Keychain. Kept as our own enum so `KeychainStoring` doesn't leak
+/// `Security.framework` types into call sites.
 public enum KeychainAccessibility {
     /// Accessible once the device has been unlocked after a reboot, and never
     /// migrates to other devices via iCloud Keychain. This is the right
@@ -28,6 +29,16 @@ public enum KeychainAccessibility {
 
     /// Accessible whenever the device is unlocked; also device-local only.
     case whenUnlockedThisDeviceOnly
+
+    /// Accessible once the device has been unlocked after a reboot, and
+    /// **synced via iCloud Keychain** to the user's other devices signed
+    /// into the same iCloud account (e.g. their next phone after an
+    /// upgrade). Opt into this only if you specifically want the identity
+    /// to follow the user across their own devices — see the README section
+    /// on cross-device identity for the tradeoffs (requires iCloud Keychain
+    /// to be enabled; does not apply to devices the item hasn't synced to
+    /// yet; no longer purely "one device" scoped).
+    case afterFirstUnlockSynchronizable
 }
 
 /// Errors surfaced by `KeychainStoring` implementations.

@@ -31,8 +31,10 @@ print(info.firstSeenDate) // Date this identity was first created
 - On first successful call, a random `UUID` + the current `Date` are encoded
   to JSON and written to a `kSecClassGenericPassword` Keychain item with
   `kSecAttrAccessibleAfterFirstUnlockThisDeviceOnly` — accessible after the
-  device's first unlock post-reboot, and explicitly **not** synced via iCloud
-  Keychain to the user's other devices.
+  device's first unlock post-reboot, and by default **not** synced via iCloud
+  Keychain to the user's other devices. An opt-in accessibility level is
+  available if you specifically want the identity to follow the user across
+  their own devices — see [Cross-device identity](#cross-device-identity).
 - Every later call reads that same item back instead of creating a new one.
 - Deleting and reinstalling the app removes `UserDefaults` and app files, but
   the Keychain item is untouched (same Team ID + Bundle ID reinstall), so the
@@ -61,6 +63,37 @@ runs against `InMemoryKeychainStore` and covers first-launch detection,
 persistence across independent instances, isolation between different
 `service`/`account` pairs, `reset()`, error propagation, and concurrent
 first-access thread-safety.
+
+## Cross-device identity
+
+By default the identity is strictly per-device: reinstalling the app on the
+*same* device finds it, but a fresh install on a *different* device (e.g. the
+user's new phone after an upgrade) looks like a genuinely first-ever launch.
+
+If you want the identity to follow the user to their next device instead,
+opt into iCloud Keychain sync by passing `.afterFirstUnlockSynchronizable`:
+
+```swift
+let identifier = InstallIdentifier(accessibility: .afterFirstUnlockSynchronizable)
+let info = try identifier.resolve()
+```
+
+This stores the item as syncable, so once it has synced, `resolve()` on the
+user's other devices signed into the same iCloud account will read back the
+same `id` and `firstSeenDate` instead of creating a new record. Tradeoffs to
+be aware of before enabling this:
+
+- Requires the user to have **iCloud Keychain** enabled; if it's off (or
+  they're not signed in), behavior silently falls back to being device-local.
+- Sync is not instant — a new device may briefly report
+  `isFirstLaunchEver == true` before the existing item has propagated.
+- This is no longer a purely "one device" signal — factor that into how you
+  use `isFirstLaunchEver` (e.g. it's a better fit for "has this *user*
+  installed before" than for anything meant to be tied to one physical
+  device).
+- It syncs only within the user's own iCloud account/devices, never across
+  different users or Apple IDs — it does not turn this into a
+  cross-user tracking or fingerprinting mechanism.
 
 ## Installation
 
@@ -99,8 +132,12 @@ other persisted identifier.
   and is affected by whether the device was restored from a backup or is the
   original device. Treat `isFirstLaunchEver == true` as "no evidence of a
   prior install", not as a legal/security guarantee.
-- **Full device wipe / new device** always resets the identity — this is a
-  per-device, not a per-user or per-iCloud-account identifier.
+- **Full device wipe / new device** always resets the identity when using the
+  default accessibility — this is a per-device, not a per-user or
+  per-iCloud-account identifier. Opting into
+  `.afterFirstUnlockSynchronizable` (see
+  [Cross-device identity](#cross-device-identity)) changes this deliberately
+  and comes with its own tradeoffs.
 - `reset()` exists for debug/test flows only; calling it in a shipped code
   path defeats the entire purpose of the library.
 
