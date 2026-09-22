@@ -127,6 +127,23 @@ point it at this repository, or add it to `Package.swift`:
 .package(url: "https://github.com/pollini/MVPInstallIdentityKit.git", from: "1.0.0")
 ```
 
+## Example app
+
+`Example/` is a minimal SwiftUI app for manually verifying the Keychain
+behavior on a simulator or device — unit tests can't touch the real
+Keychain, so this is the only way to confirm resolve/reset and the three
+accessibility modes actually behave as documented across a delete +
+reinstall (or a device migration). It's an [XcodeGen](https://github.com/yonaskolb/XcodeGen)
+project spec, not a checked-in `.xcodeproj`, to keep the generated project
+out of git:
+
+```sh
+brew install xcodegen   # once
+cd Example
+xcodegen generate
+open MVPInstallIdentityKitDemo.xcodeproj
+```
+
 ## Privacy & App Store notes
 
 This pattern (persist an identifier in the Keychain so it survives

@@ -21,7 +21,7 @@ public protocol KeychainStoring {
 /// install identifier, plus whether the item should sync via iCloud
 /// Keychain. Kept as our own enum so `KeychainStoring` doesn't leak
 /// `Security.framework` types into call sites.
-public enum KeychainAccessibility {
+public enum KeychainAccessibility: Hashable {
     /// Accessible once the device has been unlocked after a reboot, and never
     /// migrates to other devices via iCloud Keychain. This is the right
     /// default for a device-local install identifier.
