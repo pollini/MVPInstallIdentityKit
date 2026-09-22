@@ -1,5 +1,10 @@
 # MVPInstallIdentityKit
 
+[![Swift](https://github.com/pollini/MVPInstallIdentityKit/actions/workflows/swift.yml/badge.svg)](https://github.com/pollini/MVPInstallIdentityKit/actions/workflows/swift.yml)
+![Swift 5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)
+![Platforms](https://img.shields.io/badge/platforms-iOS%2013%2B%20%7C%20macOS%2011%2B-blue.svg)
+[![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
+
 A tiny, dependency-free Swift package that answers one question reliably:
 
 > **Has this app been installed on this device before — even if it was deleted and reinstalled in between?**
