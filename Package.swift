@@ -16,7 +16,8 @@ let package = Package(
     targets: [
         .target(
             name: "MVPInstallIdentityKit",
-            dependencies: []
+            dependencies: [],
+            resources: [.copy("PrivacyInfo.xcprivacy")]
         ),
         .testTarget(
             name: "MVPInstallIdentityKitTests",

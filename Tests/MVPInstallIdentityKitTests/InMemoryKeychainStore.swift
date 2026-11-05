@@ -2,8 +2,7 @@ import Foundation
 @testable import MVPInstallIdentityKit
 
 /// In-memory stand-in for the real Keychain so tests are fast, deterministic,
-/// and don't depend on a Keychain being available (e.g. Linux CI runners
-/// don't have one at all).
+/// and don't depend on the real Keychain's persistent, signing-dependent state.
 final class InMemoryKeychainStore: KeychainStoring {
     private var storage: [String: Data] = [:]
 

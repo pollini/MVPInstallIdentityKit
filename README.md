@@ -61,9 +61,11 @@ InstallIdentifier          — public API, orchestrates read/create/persist
 ```
 
 Injecting `KeychainStoring` is what makes the whole thing unit-testable
-without a real Keychain — which matters because the Keychain is flaky and
-often unavailable in plain `swift test` runs (e.g. on Linux CI, or in a
-simulator without a signed-in Apple ID). All of `InstallIdentifierTests.swift`
+without a real Keychain — which matters because the real Keychain is
+persistent, shared system state that depends on code signing and
+entitlements, so tests against it would be order-dependent, leave items
+behind, and behave differently between local machines and CI runners. All of
+`InstallIdentifierTests.swift`
 runs against `InMemoryKeychainStore` and covers first-launch detection,
 persistence across independent instances, isolation between different
 `service`/`account` pairs, `reset()`, error propagation, and concurrent
@@ -169,6 +171,11 @@ or cross-app sharing — it's a local, opt-in-by-integration building block.
 If you use it, document in your own app's privacy manifest / App Store
 privacy labels what you use the identifier for, same as you would for any
 other persisted identifier.
+
+The package ships its own `PrivacyInfo.xcprivacy`, declaring no tracking,
+no collected data and no required-reason API usage — the Keychain item never
+leaves the device (apart from Apple's own iCloud Keychain sync, if you opt
+into `.afterFirstUnlockSynchronizable`).
 
 ## Known limitations
 
