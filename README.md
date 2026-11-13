@@ -1,8 +1,8 @@
 # MVPInstallIdentityKit
 
 [![Swift](https://github.com/pollini/MVPInstallIdentityKit/actions/workflows/swift.yml/badge.svg)](https://github.com/pollini/MVPInstallIdentityKit/actions/workflows/swift.yml)
-![Swift 5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange.svg)
-![Platforms](https://img.shields.io/badge/platforms-iOS%2013%2B%20%7C%20macOS%2011%2B-blue.svg)
+[![Swift versions](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpollini%2FMVPInstallIdentityKit%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/pollini/MVPInstallIdentityKit)
+[![Platforms](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fpollini%2FMVPInstallIdentityKit%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/pollini/MVPInstallIdentityKit)
 [![License: MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg)](LICENSE)
 
 A tiny, dependency-free Swift package that answers one question reliably:
@@ -133,6 +133,11 @@ point it at this repository, or add it to `Package.swift`:
 ```swift
 .package(url: "https://github.com/pollini/MVPInstallIdentityKit.git", from: "1.0.0")
 ```
+
+Requires Swift 5.9+, iOS 13+ or macOS 11+. The package also builds for
+visionOS, tvOS and watchOS (see the
+[Swift Package Index build results](https://swiftpackageindex.com/pollini/MVPInstallIdentityKit/builds)),
+but it is only tested on iOS and macOS.
 
 ## Example app
 
